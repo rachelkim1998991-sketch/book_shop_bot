@@ -1,0 +1,24 @@
+bookstore_project/         # Asosiy Django loyihasi
+│
+├── bookstore_project/     # Django sozlamalari
+│   ├── __init__.py        #celery ulash
+│   ├── settings.py        # Baza sozlamalari (PostgreSQL/SQLite)
+│   └── urls.py
+    └──celery.py
+│
+├── books/                 # Django Ilovasi (App)
+│   ├── admin.py           # Admin panel sozlamalari
+│   ├── apps.py
+│   └── models.py          # Baza jadvallari (Yagona model)
+│
+├── telegram_bot/          # Telegram Bot qismi
+│   ├── main.py            # Botni ishga tushirish (Django muhiti bilan)
+│   └── handlers/
+│       ├── __init__.py
+│       ├── start.py       # /start buyrug'i
+│       └── catalog.py     # Kitoblarni bazadan olib ko'rsatish
+│
+├── manage.py
+└── .env                   # Token va maxfiy kalitlar
+└──Dockerfile
+└──docker-compose.yml

@@ -1,0 +1,75 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: book_shop_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: book_shop_redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  web:
+    build: .
+    container_name: book_shop_web
+    command: >
+      sh -c "python manage.py migrate &&
+            python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DB_HOST=db
+    depends_on:
+      - db
+      - redis
+
+  bot:
+    build: .
+    container_name: book_shop_bot_service
+    command: python telegram_bot/main.py
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DB_HOST=db
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  celery:
+    build: .
+    container_name: book_shop_celery
+    command: celery -A bookstore_project worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DB_HOST=db
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
